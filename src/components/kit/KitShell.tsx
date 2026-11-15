@@ -1,8 +1,9 @@
+import { headers } from "next/headers";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { PLATFORM } from "@/config/platform";
-import { CONFIG_ENV_NAME, KIT } from "@/config/site";
+import { CONFIG_ENV_NAME, KIT, showSetupBanner } from "@/config/site";
 
 /** Frame for Liftoff's own pages (kit mode). */
 export function KitShell({ children, configError }: { children: ReactNode; configError: string | null }) {
@@ -26,22 +27,7 @@ export function KitShell({ children, configError }: { children: ReactNode; confi
           { href: "/showcase", label: "Showcase" },
         ]}
       />
-      <div role="region" aria-label="Setup status" className="border-b border-line bg-soft">
-        <p className="wrap py-2 text-sm text-text">
-          {configError ? (
-            <>
-              <strong>Finish setup.</strong> The {CONFIG_ENV_NAME} value on this deployment could not be used:{" "}
-              {configError} <Link href="/setup">Open the setup wizard</Link> to make a new one.
-            </>
-          ) : (
-            <>
-              <strong>Finish setup.</strong> Deployed this for your own token? This copy has no site config yet.{" "}
-              <Link href="/setup">Open the setup wizard</Link>, then follow the{" "}
-              <Link href="/guide">guide</Link>.
-            </>
-          )}
-        </p>
-      </div>
+      <SetupBanner configError={configError} />
       <main id="main" className="flex-1">
         {children}
       </main>
@@ -69,5 +55,33 @@ export function KitShell({ children, configError }: { children: ReactNode; confi
         </div>
       </footer>
     </>
+  );
+}
+
+/**
+ * "Finish setup" banner. Hidden on the official hosted copy (KIT.homeUrl) and
+ * shown on every other deployment that has no usable site config. It reads
+ * the request host, so kit pages render per request.
+ */
+async function SetupBanner({ configError }: { configError: string | null }) {
+  const host = (await headers()).get("host");
+  if (!showSetupBanner(host, configError)) return null;
+  return (
+    <div role="region" aria-label="Setup status" className="border-b border-line bg-soft">
+      <p className="wrap py-2 text-sm text-text">
+        {configError ? (
+          <>
+            <strong>Finish setup.</strong> The {CONFIG_ENV_NAME} value on this deployment could not be used:{" "}
+            {configError} <Link href="/setup">Open the setup wizard</Link> to make a new one.
+          </>
+        ) : (
+          <>
+            <strong>Finish setup.</strong> Deployed this for your own token? This copy has no site config yet.{" "}
+            <Link href="/setup">Open the setup wizard</Link>, then follow the{" "}
+            <Link href="/guide">guide</Link>.
+          </>
+        )}
+      </p>
+    </div>
   );
 }

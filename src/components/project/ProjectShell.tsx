@@ -35,7 +35,7 @@ export function ProjectShell({
             {KIT.labels.testnet} This token is on {CHAIN.name}. Nothing on this site is financial advice.
           </p>
           <p className="font-mono">
-            <a href={KIT.repoUrl} target="_blank" rel="noopener noreferrer">
+            <a href={KIT.homeUrl} target="_blank" rel="noopener noreferrer">
               Make your own site with {KIT.name}
             </a>
           </p>

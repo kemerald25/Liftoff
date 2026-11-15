@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Instrument_Sans, JetBrains_Mono } from "next/font/google";
 import type { ReactNode } from "react";
 import { themeInitScript } from "@/components/ThemeToggle";
-import { KIT, getSiteMode } from "@/config/site";
+import { KIT, getSiteMode, metadataBaseUrl } from "@/config/site";
 import { getTokenInfo } from "@/lib/explorer";
 import { accentCss } from "@/lib/accent";
 import "./globals.css";
@@ -10,15 +10,9 @@ import "./globals.css";
 const bodyFont = Instrument_Sans({ subsets: ["latin"], variable: "--font-body", display: "swap" });
 const headingFont = JetBrains_Mono({ subsets: ["latin"], variable: "--font-heading", display: "swap" });
 
-function siteUrl(): URL {
-  // VERCEL_PROJECT_PRODUCTION_URL is set by Vercel itself; builders never configure it.
-  const host = process.env.VERCEL_PROJECT_PRODUCTION_URL;
-  return new URL(host ? `https://${host}` : "http://localhost:3000");
-}
-
 export async function generateMetadata(): Promise<Metadata> {
   const site = getSiteMode();
-  const base = { metadataBase: siteUrl(), openGraph: { images: ["/og"] }, twitter: { card: "summary_large_image" as const } };
+  const base = { metadataBase: metadataBaseUrl(site.mode, process.env.VERCEL_PROJECT_PRODUCTION_URL), openGraph: { images: ["/og"] }, twitter: { card: "summary_large_image" as const } };
   if (site.mode === "kit") {
     return {
       ...base,
