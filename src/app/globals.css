@@ -1,0 +1,236 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens, shared with Preflight so the toolkit reads as one family.
+ * Dark is the default. Light applies when the visitor's system asks for it,
+ * or when they pick it with the theme toggle (data-theme on <html>).
+ */
+:root {
+  color-scheme: dark;
+  --bg: #0e1010;
+  --surface: #161917;
+  --panel: #191c1b;
+  --text: #f1f4eb;
+  --body: #ced3c8;
+  --muted: #a0a99b;
+  --line: #30352e;
+  --accent: #dff902;
+  --accent-ink: #0e1010;
+  --soft: #262e13;
+  --warn: #ffc56b;
+  --danger: #ffb1a6;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+    --bg: #ffffff;
+    --surface: #f7f8f5;
+    --panel: #fbfcf9;
+    --text: #191c18;
+    --body: #42493f;
+    --muted: #636b60;
+    --line: #e1e5dc;
+    --accent: #426000;
+    --accent-ink: #ffffff;
+    --soft: #f0f7d8;
+    --warn: #7a4a00;
+    --danger: #a3261a;
+  }
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #ffffff;
+  --surface: #f7f8f5;
+  --panel: #fbfcf9;
+  --text: #191c18;
+  --body: #42493f;
+  --muted: #636b60;
+  --line: #e1e5dc;
+  --accent: #426000;
+  --accent-ink: #ffffff;
+  --soft: #f0f7d8;
+  --warn: #7a4a00;
+  --danger: #a3261a;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-panel: var(--panel);
+  --color-text: var(--text);
+  --color-body: var(--body);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-soft: var(--soft);
+  --color-warn: var(--warn);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-heading), ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+/* Base element styles live in the base layer so component classes (buttons) can override them. */
+@layer base {
+  html {
+    background: var(--bg);
+    -webkit-text-size-adjust: 100%;
+    /* Keeps in-page links clear of the fixed header. */
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--body);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    min-width: 320px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: var(--text);
+    font-family: var(--font-mono);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  a {
+    color: var(--accent);
+    text-underline-offset: 3px;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+}
+
+@layer components {
+  .wrap {
+    @apply mx-auto w-full max-w-5xl px-4 sm:px-6;
+  }
+
+  .label {
+    @apply font-mono text-[0.7rem] font-medium tracking-[0.12em] text-muted uppercase;
+  }
+
+  .panel {
+    @apply rounded-lg border border-line bg-panel p-4 sm:p-6;
+  }
+
+  .btn {
+    @apply inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-md border border-line bg-surface px-4 py-2 font-mono text-sm font-medium text-text no-underline transition-colors;
+  }
+
+  .btn:hover {
+    @apply border-muted no-underline;
+  }
+
+  .btn:disabled {
+    @apply cursor-not-allowed opacity-60;
+  }
+
+  .btn-primary {
+    @apply border-accent bg-accent text-accent-ink;
+  }
+
+  .btn-primary:hover {
+    @apply border-accent brightness-110;
+  }
+
+  .btn-small {
+    @apply min-h-9 px-3 py-1 text-xs;
+  }
+
+  .input {
+    @apply block min-h-11 w-full rounded-md border border-line bg-bg px-3 py-2 text-base text-text;
+  }
+
+  .input::placeholder {
+    color: var(--muted);
+    opacity: 0.7;
+  }
+
+  .tag {
+    @apply inline-flex items-center rounded border border-line bg-soft px-1.5 py-0.5 font-mono text-[0.65rem] tracking-wider text-text uppercase;
+  }
+
+  .note {
+    @apply text-sm text-muted;
+  }
+
+  .prose-liftoff {
+    @apply space-y-3 break-words;
+  }
+
+  .prose-liftoff h3 {
+    @apply pt-2 text-lg;
+  }
+
+  .prose-liftoff h4 {
+    @apply pt-1 text-base;
+  }
+
+  .prose-liftoff ul {
+    @apply list-disc space-y-1 pl-5;
+  }
+
+  .prose-liftoff ol {
+    @apply list-decimal space-y-1 pl-5;
+  }
+
+  .prose-liftoff blockquote {
+    @apply border-l-2 border-accent pl-3 text-muted;
+  }
+
+  .prose-liftoff code {
+    @apply rounded bg-soft px-1 py-0.5 font-mono text-[0.9em] text-text;
+  }
+
+  .prose-liftoff strong {
+    @apply font-semibold text-text;
+  }
+}
+
+/* The three looks share every safety element; only personality differs. */
+[data-look="meme"] .look-title {
+  @apply text-[clamp(2.5rem,11vw,5.5rem)] leading-none font-bold tracking-tighter uppercase;
+}
+
+[data-look="product"] .look-title {
+  @apply text-[clamp(2rem,6vw,3.25rem)] font-semibold;
+}
+
+[data-look="rwa"] .look-title {
+  @apply font-sans text-[clamp(1.75rem,5vw,2.5rem)] font-semibold tracking-tight;
+}
+
+[data-look="rwa"] h2 {
+  @apply font-sans tracking-tight;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
