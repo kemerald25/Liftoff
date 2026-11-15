@@ -162,8 +162,9 @@
   }
 
   .input::placeholder {
+    /* Full-strength muted: a dimmed placeholder falls below AA contrast. */
     color: var(--muted);
-    opacity: 0.7;
+    opacity: 1;
   }
 
   .tag {

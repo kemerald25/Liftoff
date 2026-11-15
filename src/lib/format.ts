@@ -83,6 +83,12 @@ export function contrastRatio(a: string, b: string): number {
 
 export const THEME_BACKGROUNDS = { dark: "#0e1010", light: "#ffffff" } as const;
 
+/** Every surface an accent-coloured link or label can sit on, per theme (see globals.css). */
+export const THEME_SURFACES = {
+  dark: ["#0e1010", "#161917", "#191c1b", "#262e13"],
+  light: ["#ffffff", "#f7f8f5", "#fbfcf9", "#f0f7d8"],
+} as const;
+
 export type AccentResult = {
   /** Accent to use in each theme, or null when the colour fails AA contrast there. */
   dark: { accent: string; ink: string } | null;
@@ -100,7 +106,7 @@ export function resolveAccent(hex: string | undefined): AccentResult {
   const accent = hex.toLowerCase();
   const ink = contrastRatio(accent, "#000000") >= contrastRatio(accent, "#ffffff") ? "#0e1010" : "#ffffff";
   const inkPasses = contrastRatio(accent, ink) >= 4.5;
-  const usable = (background: string) =>
-    inkPasses && contrastRatio(accent, background) >= 4.5 ? { accent, ink } : null;
-  return { dark: usable(THEME_BACKGROUNDS.dark), light: usable(THEME_BACKGROUNDS.light) };
+  const usable = (surfaces: readonly string[]) =>
+    inkPasses && surfaces.every((surface) => contrastRatio(accent, surface) >= 4.5) ? { accent, ink } : null;
+  return { dark: usable(THEME_SURFACES.dark), light: usable(THEME_SURFACES.light) };
 }
