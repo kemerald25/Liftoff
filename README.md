@@ -6,6 +6,8 @@
 > Liftoff works on Robinhood Chain Testnet only. Test ETH and testnet tokens have no monetary value.
 > Nothing here is financial advice.
 
+**Hosted copy: <https://liftoff-vibe.vercel.app>** (setup wizard, guide, live demo and showcase).
+
 Liftoff is a free, open-source (MIT) template. You paste your token's contract address into a setup
 wizard, pick a look, write a few lines, and deploy your own copy to Vercel's free plan. You get:
 
@@ -53,7 +55,7 @@ There are exactly two environment variables:
 
 You need a free GitHub account and a free Vercel account.
 
-1. Open the setup wizard on a hosted Liftoff site (the `/setup` page).
+1. Open the setup wizard: <https://liftoff-vibe.vercel.app/setup>.
 2. Paste your **token contract address**. The wizard checks it on the chain and shows the token's
    name, symbol and supply so you can confirm it is yours.
 3. Pick a look, then add your tagline, description, links, and (if you want one) holder-area content.
@@ -75,7 +77,7 @@ Your site has no admin page. To change it you make new strings and swap them in 
 
 1. In Vercel, open your project, then **Settings**, then **Environment Variables**. Copy the current
    value of `NEXT_PUBLIC_LIFTOFF_CONFIG` (and `LIFTOFF_HOLDER_CONTENT` if you have one).
-2. Open the setup wizard, press **Import config**, and paste the strings. Your content appears in the form.
+2. Open the [setup wizard](https://liftoff-vibe.vercel.app/setup), press **Import config**, and paste the strings. Your content appears in the form.
 3. Change what you want, then copy the new strings.
 4. Back in Vercel, edit each variable, replace the old value with the new one, and save.
 5. Open **Deployments**, press the three dots next to the latest deployment, and choose **Redeploy**.
@@ -156,7 +158,7 @@ Checks:
 | `pnpm test` | Unit tests (Vitest) |
 | `pnpm build` | Production build |
 | `pnpm test:e2e` | End-to-end tests (Playwright) with the explorer and RPC mocked. First run: `pnpm exec playwright install chromium` |
-| `pnpm check:leak` | The holder-content leak check described above |
+| `pnpm check:leak` | The holder-content leak check described above. CI runs it on every push |
 
 The end-to-end tests build three copies of the app into `.next-e2e/` (kit mode, project mode, and
 project mode with the explorer down) and run them side by side. A small preload script
@@ -231,8 +233,13 @@ Decisions made while building, where the brief left room:
 - A custom accent colour is used only in the themes (dark, light) where it reaches WCAG AA contrast.
 - The gate reads the token's `decimals()` from the chain rather than assuming 18.
 - The wallet connection is not remembered between page loads (no browser storage is used for it).
-- The "Finish setup" banner is always shown in kit mode, because an unconfigured copy cannot tell
-  whether it is the main Liftoff site or a builder's fresh deployment.
+- The "Finish setup" banner is hidden on the official hosted copy and shown on every other
+  unconfigured deployment. The official address is `KIT.homeUrl` in `src/config/site.ts`; the banner
+  compares it with the host of each request, so no extra environment variable is needed. Kit-mode pages
+  are therefore rendered per request. The same constant is the metadata base URL in kit mode, appears on
+  the kit's Open Graph image, and is where the Deploy Button's help link and the project footer's
+  "Make your own site" link point.
+- Open Graph images carry the full unofficial label for their mode, not a shortened one.
 
 ## Contributing
 

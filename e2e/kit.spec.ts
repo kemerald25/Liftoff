@@ -1,5 +1,6 @@
+import http from "node:http";
 import { expect, test } from "@playwright/test";
-import { E2E_CONFIG_STRING, E2E_HOLDER, E2E_HOLDER_STRING, E2E_SITE, TOKEN, urlFor } from "./fixtures";
+import { E2E_CONFIG_STRING, E2E_HOLDER, E2E_HOLDER_STRING, E2E_SITE, PORTS, TOKEN, urlFor } from "./fixtures";
 import { mockChain } from "./support/browser";
 
 const KIT_LABEL = "Unofficial community tool. Not affiliated with or endorsed by vibe/vibe.";
@@ -25,11 +26,40 @@ test.describe("kit mode (no config)", () => {
     expect(params.get("env")).toBe("NEXT_PUBLIC_LIFTOFF_CONFIG");
     expect(params.get("repository-url")).toContain("github.com");
     expect(params.get("envDescription")).toBeTruthy();
-    expect(params.get("envLink")).toContain("https://");
+    expect(params.get("envLink")).toBe("https://liftoff-vibe.vercel.app/setup");
 
     // No price or trading language in default copy.
     const text = (await page.locator("body").innerText()).toLowerCase();
     for (const phrase of ["buy now", "price chart", "guaranteed", "to the moon"]) expect(text).not.toContain(phrase);
+  });
+
+  test("Finish setup banner is hidden on the official host and shown everywhere else", async () => {
+    // Ask the same server for the home page under different Host headers.
+    const fetchHome = (host: string) =>
+      new Promise<string>((resolve, reject) => {
+        const request = http.get(
+          { hostname: "127.0.0.1", port: PORTS.kit, path: "/", headers: { Host: host } },
+          (response) => {
+            let body = "";
+            response.setEncoding("utf8");
+            response.on("data", (chunk: string) => (body += chunk));
+            response.on("end", () => resolve(body));
+          },
+        );
+        request.on("error", reject);
+      });
+
+    const official = await fetchHome("liftoff-vibe.vercel.app");
+    expect(official).toContain("real project site");
+    expect(official).toContain(KIT_LABEL);
+    expect(official).not.toContain("Finish setup.");
+    expect(official).not.toContain('aria-label="Setup status"');
+
+    for (const host of ["my-liftoff-site.vercel.app", `localhost:${PORTS.kit}`, "liftoff-vibe.vercel.app.evil.example", "liftoff-kit.vercel.app"]) {
+      const other = await fetchHome(host);
+      expect(other, host).toContain("Finish setup.");
+      expect(other, host).toContain('aria-label="Setup status"');
+    }
   });
 
   test("guide, showcase and demo render; project routes do not exist", async ({ page }) => {
